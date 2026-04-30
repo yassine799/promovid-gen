@@ -235,10 +235,16 @@ const ExportModal = ({ state, onClose }) => {
         } catch(e) { /* skip logo if load fails */ }
       }
 
-      // Hidden video element for frame capture
+      // Hidden video element for frame capture — must be in DOM so
+      // requestVideoFrameCallback gets wired into the compositor pipeline.
       const vid = document.createElement('video');
       vid.src = state.video.url;
       vid.playsInline = true;
+      Object.assign(vid.style, {
+        position: 'fixed', top: '-9999px', left: '-9999px',
+        width: '1px', height: '1px', opacity: '0', pointerEvents: 'none',
+      });
+      document.body.appendChild(vid);
 
       await new Promise((res, rej) => {
         vid.onloadedmetadata = res;
@@ -330,6 +336,7 @@ const ExportModal = ({ state, onClose }) => {
         finished = true;
         if (scriptProcessor) { scriptProcessor.disconnect(); scriptProcessor.onaudioprocess = null; }
         if (audioCtx) audioCtx.close();
+        if (vid.parentNode) vid.parentNode.removeChild(vid);
         setStepIdx(3);
         await videoEncoder.flush();
         if (audioEncoder) await audioEncoder.flush();
@@ -364,6 +371,7 @@ const ExportModal = ({ state, onClose }) => {
       cleanupRef.current = () => {
         finished = true;
         vid.pause(); vid.src = '';
+        if (vid.parentNode) vid.parentNode.removeChild(vid);
         if (scriptProcessor) { scriptProcessor.disconnect(); scriptProcessor.onaudioprocess = null; }
         if (audioCtx) audioCtx.close();
         if (videoEncoder.state !== 'closed') videoEncoder.close();
