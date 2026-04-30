@@ -19,7 +19,7 @@ function wrapWords(ctx, text, maxW) {
 
 // logoImg is a pre-whitened canvas/image element, or null
 function drawOverlay(ctx, W, H, state, logoImg = null) {
-  const { preset, data, fontFamily, fontScale = 1 } = state;
+  const { preset, data, fontFamily, bodyFontFamily, fontScale = 1 } = state;
   const { artistName = '', venue = '', date = '', time = '', cta = '', logoMode = 'text' } = data;
   const dateStr = window.formatDate ? window.formatDate(date) : date;
   const timeStr = time || '';
@@ -47,7 +47,8 @@ function drawOverlay(ctx, W, H, state, logoImg = null) {
     try { ctx.letterSpacing = '-0.02em'; } catch(e) {}
   };
   const setMono = (size) => {
-    ctx.font = `500 ${size * em}px "JetBrains Mono", monospace`;
+    const bodyFamily = (bodyFontFamily?.match(/^['"]?([^'"',]+)/) || [])[1]?.trim() || 'JetBrains Mono';
+    ctx.font = `500 ${size * em}px "${bodyFamily}", monospace`;
     try { ctx.letterSpacing = '0.12em'; } catch(e) {}
   };
 
@@ -109,7 +110,7 @@ function drawOverlay(ctx, W, H, state, logoImg = null) {
       return h;
     })();
     fillArtistMark(x0, safeTop + safeH / 2 - markH / 2, 3.2, 'center');
-    fillMeta(cta || 'LIVE', W / 2, bottom - 0.85 * em * 1.2, 0.85, 'center');
+    if (cta) fillMeta(cta, W / 2, bottom - 0.85 * em * 1.2, 0.85, 'center');
   }
   else if (preset === 'top-bottom') {
     fillArtistMark(x0, safeTop + padY, 2.6, 'center');
@@ -157,13 +158,13 @@ function drawOverlay(ctx, W, H, state, logoImg = null) {
     metas.forEach(l => { fillMeta(l, leftPad, dy, 0.85, 'left'); dy += metaLineH; });
   }
   else if (preset === 'corner-tags') {
-    fillMeta(venue || '—', x0, safeTop + padY, 0.8, 'left');
-    fillMeta(dateStr || '—', x0, safeTop + padY + 0.8 * em * 1.4, 0.8, 'left');
+    if (venue) fillMeta(venue, x0, safeTop + padY, 0.8, 'left');
+    if (dateStr) fillMeta(dateStr, x0, safeTop + padY + 0.8 * em * 1.4, 0.8, 'left');
     if (showLogo) {
       const maxH = Math.min(safeH * 8 / 100, 3 * em);
       fillLogo(x1, safeTop + padY, maxH, innerW * 0.3, 'right');
-    } else {
-      fillMeta(timeStr || 'LIVE', x1, safeTop + padY, 0.8, 'right');
+    } else if (timeStr) {
+      fillMeta(timeStr, x1, safeTop + padY, 0.8, 'right');
     }
     setDisplay(1.8);
     const aLineH = 1.8 * fontScale * em * 0.95;
@@ -171,7 +172,7 @@ function drawOverlay(ctx, W, H, state, logoImg = null) {
     const aTop = bottom - aLines.length * aLineH;
     ctx.textAlign = 'left'; ctx.textBaseline = 'top';
     aLines.forEach((l, i) => ctx.fillText(l, x0, aTop + i * aLineH));
-    fillMeta(cta || '◉ REC', x1, bottom - 0.8 * em * 1.2, 0.8, 'right');
+    if (cta) fillMeta(cta, x1, bottom - 0.8 * em * 1.2, 0.8, 'right');
   }
 
   ctx.restore();

@@ -18,6 +18,8 @@ const INITIAL = {
   fontFamily: "'Archivo Black', sans-serif",
   fontName: 'Archivo Black',
   fontScale: 1.0,
+  bodyFontFamily: "'JetBrains Mono', monospace",
+  bodyFontName: 'JetBrains Mono',
   aspect: '9:16',
   showSafeZone: true,
   animate: true,

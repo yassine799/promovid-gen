@@ -8,7 +8,7 @@ const formatDate = (iso) => {
   return `${String(d.getDate()).padStart(2,'0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
 };
 
-const Overlay = ({ preset, data, fontFamily, fontScale = 1, animate = true }) => {
+const Overlay = ({ preset, data, fontFamily, bodyFontFamily, fontScale = 1, animate = true }) => {
   const { artistName, logoUrl, logoMode, venue, date, time, cta } = data;
 
   const dateStr = formatDate(date);
@@ -50,7 +50,7 @@ const Overlay = ({ preset, data, fontFamily, fontScale = 1, animate = true }) =>
 
   const MetaLine = ({ children, size = 1, align = 'center' }) => (
     <div style={{
-      fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+      fontFamily: bodyFontFamily || 'JetBrains Mono, ui-monospace, monospace',
       fontWeight: 500,
       fontSize: `${size}em`,
       letterSpacing: '0.12em',
@@ -71,7 +71,7 @@ const Overlay = ({ preset, data, fontFamily, fontScale = 1, animate = true }) =>
           <div style={{ flex: 1, display: 'grid', placeItems: 'center', padding: '4% 0' }}>
             <ArtistMark size={3.2} textAlign="center" />
           </div>
-          <MetaLine size={0.85} align="center">{cta || 'LIVE'}</MetaLine>
+          {cta && <MetaLine size={0.85} align="center">{cta}</MetaLine>}
         </div>
       </div>
     );
@@ -154,14 +154,14 @@ const Overlay = ({ preset, data, fontFamily, fontScale = 1, animate = true }) =>
         <div className="safe" style={{ justifyContent: 'space-between', alignItems: 'stretch', flexDirection: 'column' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em' }}>
-              <MetaLine size={0.8} align="left">{venue || '—'}</MetaLine>
-              <MetaLine size={0.8} align="left">{dateStr || '—'}</MetaLine>
+              {venue && <MetaLine size={0.8} align="left">{venue}</MetaLine>}
+              {dateStr && <MetaLine size={0.8} align="left">{dateStr}</MetaLine>}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6em' }}>
               {logoUrl && (logoMode === 'logo' || logoMode === 'both') && (
                 <img className="logo" src={logoUrl} alt="" style={{ height: '8%', maxHeight: '3em', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
               )}
-              <MetaLine size={0.8} align="right">{timeStr || 'LIVE'}</MetaLine>
+              {timeStr && <MetaLine size={0.8} align="right">{timeStr}</MetaLine>}
             </div>
           </div>
           <div style={{ flex: 1 }} />
@@ -177,7 +177,7 @@ const Overlay = ({ preset, data, fontFamily, fontScale = 1, animate = true }) =>
                 maxWidth: '70%',
               }}>{artistName}</div>
             ) : <div />}
-            <MetaLine size={0.8} align="right">{cta || '◉ REC'}</MetaLine>
+            {cta && <MetaLine size={0.8} align="right">{cta}</MetaLine>}
           </div>
         </div>
       </div>

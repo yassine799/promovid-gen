@@ -9,6 +9,7 @@ const DEFAULT_FONTS = [
   { name: 'Bebas Neue', family: "'Bebas Neue', sans-serif", weight: 'Regular 400', tag: 'display' },
   { name: 'Anton', family: "'Anton', sans-serif", weight: 'Regular 400', tag: 'display' },
   { name: 'Space Mono', family: "'Space Mono', monospace", weight: 'Bold 700', tag: 'mono' },
+  { name: 'JetBrains Mono', family: "'JetBrains Mono', monospace", weight: 'Medium 500', tag: 'mono' },
 ];
 
 const PRESETS = [
@@ -213,33 +214,51 @@ const Form = ({ state, setState }) => {
           <div className="count">04</div>
         </div>
 
-        <div className="font-list">
-          {fonts.map(f => (
-            <div key={f.name} className={`font-opt ${state.fontFamily === f.family ? 'on' : ''}`}
-              style={{ fontFamily: f.family }}
-              onClick={() => setState(s => ({ ...s, fontFamily: f.family, fontName: f.name }))}>
-              <span>{f.name}</span>
-              <span className="fm">{f.weight}</span>
+        {/* Headlines */}
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Headline</div>
+          <div className="font-list">
+            {fonts.map(f => (
+              <div key={f.name} className={`font-opt ${state.fontFamily === f.family ? 'on' : ''}`}
+                style={{ fontFamily: f.family }}
+                onClick={() => setState(s => ({ ...s, fontFamily: f.family, fontName: f.name }))}>
+                <span>{f.name}</span>
+                <span className="fm">{f.weight}</span>
+              </div>
+            ))}
+          </div>
+          <div className="field" style={{ marginTop: 10 }}>
+            <label>Scale <span style={{ fontFamily: 'var(--mono)', color: 'var(--text-4)', fontSize: 10.5 }}>{Math.round(state.fontScale * 100)}%</span></label>
+            <div className="slider-row">
+              <input type="range" min="0.7" max="1.4" step="0.02"
+                value={state.fontScale}
+                onChange={e => setState(s => ({ ...s, fontScale: parseFloat(e.target.value) }))} />
+              <div className="val">{state.fontScale.toFixed(2)}×</div>
             </div>
-          ))}
+          </div>
         </div>
 
-        <label className="btn sm" style={{ marginTop: 8, width: '100%', justifyContent: 'center', cursor: 'pointer' }}>
+        {/* Body */}
+        <div>
+          <div style={{ fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Body</div>
+          <div className="font-list">
+            {fonts.map(f => (
+              <div key={f.name} className={`font-opt ${state.bodyFontFamily === f.family ? 'on' : ''}`}
+                style={{ fontFamily: f.family }}
+                onClick={() => setState(s => ({ ...s, bodyFontFamily: f.family, bodyFontName: f.name }))}>
+                <span>{f.name}</span>
+                <span className="fm">{f.weight}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <label className="btn sm" style={{ marginTop: 10, width: '100%', justifyContent: 'center', cursor: 'pointer' }}>
           <input ref={fontInputRef} type="file" accept=".ttf,.otf,.woff,.woff2" className="file-input"
             onChange={e => onFontFile(e.target.files?.[0])} />
           <Icon name="upload" size={12} />
           <span>Upload custom font</span>
         </label>
-
-        <div className="field" style={{ marginTop: 14 }}>
-          <label>Scale <span style={{ fontFamily: 'var(--mono)', color: 'var(--text-4)', fontSize: 10.5 }}>{Math.round(state.fontScale * 100)}%</span></label>
-          <div className="slider-row">
-            <input type="range" min="0.7" max="1.4" step="0.02"
-              value={state.fontScale}
-              onChange={e => setState(s => ({ ...s, fontScale: parseFloat(e.target.value) }))} />
-            <div className="val">{state.fontScale.toFixed(2)}×</div>
-          </div>
-        </div>
       </div>
     </aside>
   );

@@ -89,6 +89,7 @@ const Preview = ({ state, setState, onExport }) => {
               preset={state.preset}
               data={state.data}
               fontFamily={state.fontFamily}
+              bodyFontFamily={state.bodyFontFamily}
               fontScale={state.fontScale}
               animate={state.animate}
             />
