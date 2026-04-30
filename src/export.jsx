@@ -235,25 +235,27 @@ const ExportModal = ({ state, onClose }) => {
         } catch(e) { /* skip logo if load fails */ }
       }
 
-      // Hidden video element for frame capture — must be in DOM so
-      // requestVideoFrameCallback gets wired into the compositor pipeline.
-      // Muted so autoplay policy never blocks it; audio is captured via
-      // WebAudio (createMediaElementSource) and is unaffected by muting.
-      const vid = document.createElement('video');
-      vid.src = state.video.url;
-      vid.playsInline = true;
-      vid.muted = true;
-      Object.assign(vid.style, {
+      const offscreen = (el) => Object.assign(el.style, {
         position: 'fixed', top: '-9999px', left: '-9999px',
         width: '1px', height: '1px', opacity: '0', pointerEvents: 'none',
       });
-      document.body.appendChild(vid);
-
-      await new Promise((res, rej) => {
-        vid.onloadedmetadata = res;
-        vid.onerror = () => rej(new Error('Failed to load video'));
+      const loadVideo = (src) => new Promise((res, rej) => {
+        const v = document.createElement('video');
+        v.src = src; v.playsInline = true;
+        offscreen(v); document.body.appendChild(v);
+        v.onloadedmetadata = () => res(v);
+        v.onerror = () => rej(new Error('Failed to load video'));
         setTimeout(() => rej(new Error('Video load timeout')), 15000);
       });
+
+      // Two separate video elements:
+      //  vid     — muted, used for canvas drawImage (frame capture)
+      //  audVid  — used only for WebAudio capture, never drawn to canvas
+      // Keeping them separate avoids Chrome's restriction that prevents
+      // drawImage() from working after createMediaElementSource() is called
+      // on the same element.
+      const vid = await loadVideo(state.video.url);
+      vid.muted = true;
 
       const W = vid.videoWidth || 1080;
       const H = vid.videoHeight || 1920;
@@ -273,8 +275,8 @@ const ExportModal = ({ state, onClose }) => {
       }
       if (!videoCodec) throw new Error('No supported H.264 encoder found in this browser.');
 
-      // Audio setup
-      let audioCtx = null, scriptProcessor = null, audioEncoder = null;
+      // Audio setup — separate video element so WebAudio never touches vid
+      let audVid = null, audioCtx = null, scriptProcessor = null, audioEncoder = null;
       let includeAudio = false;
       let audioTimestamp = 0;
 
@@ -282,8 +284,9 @@ const ExportModal = ({ state, onClose }) => {
         if (typeof AudioEncoder !== 'undefined') {
           const { supported: audioSupported } = await AudioEncoder.isConfigSupported({ codec: 'mp4a.40.2', sampleRate: 44100, numberOfChannels: 2, bitrate: 128000 });
           if (audioSupported) {
+            audVid = await loadVideo(state.video.url);
             audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 44100 });
-            const source = audioCtx.createMediaElementSource(vid);
+            const source = audioCtx.createMediaElementSource(audVid);
             scriptProcessor = audioCtx.createScriptProcessor(4096, 2, 2);
             source.connect(scriptProcessor);
             scriptProcessor.connect(audioCtx.destination);
@@ -348,13 +351,15 @@ const ExportModal = ({ state, onClose }) => {
         setStepIdx(p > 85 ? 3 : p > 15 ? 2 : 1);
       };
 
+      const removeVid = (v) => { if (v?.parentNode) v.parentNode.removeChild(v); };
+
       const finish = async () => {
         if (finished) return;
         finished = true;
         if (rafId) cancelAnimationFrame(rafId);
         if (scriptProcessor) { scriptProcessor.disconnect(); scriptProcessor.onaudioprocess = null; }
         if (audioCtx) audioCtx.close();
-        if (vid.parentNode) vid.parentNode.removeChild(vid);
+        removeVid(vid); removeVid(audVid);
         setStepIdx(3);
         await videoEncoder.flush();
         if (audioEncoder) await audioEncoder.flush();
@@ -398,7 +403,8 @@ const ExportModal = ({ state, onClose }) => {
         finished = true;
         if (rafId) cancelAnimationFrame(rafId);
         vid.pause(); vid.src = '';
-        if (vid.parentNode) vid.parentNode.removeChild(vid);
+        if (audVid) { audVid.pause(); audVid.src = ''; }
+        removeVid(vid); removeVid(audVid);
         if (scriptProcessor) { scriptProcessor.disconnect(); scriptProcessor.onaudioprocess = null; }
         if (audioCtx) audioCtx.close();
         if (videoEncoder.state !== 'closed') videoEncoder.close();
@@ -406,7 +412,12 @@ const ExportModal = ({ state, onClose }) => {
       };
 
       vid.currentTime = 0;
-      await vid.play();
+      if (audVid) audVid.currentTime = 0;
+      // Start both simultaneously so audio and video stay in sync
+      await Promise.all([
+        vid.play(),
+        audVid ? audVid.play().catch(() => {}) : Promise.resolve(),
+      ]);
 
     } catch(e) {
       setPhase('error');
