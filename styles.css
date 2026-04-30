@@ -129,7 +129,7 @@ input, textarea, select { font-family: inherit; color: inherit; }
   letter-spacing: 0.08em; font-family: var(--mono);
 }
 .section-head .count {
-  color: var(--text-4); font-family: var(--mono); font-size: 10.5px;
+  color: var(--text-3); font-family: var(--mono); font-size: 10.5px;
 }
 
 /* ==== Inputs ==== */
@@ -289,7 +289,7 @@ textarea.input { height: auto; padding: 7px 10px; resize: vertical; min-height: 
   color: var(--text-2); border: 1px solid transparent;
   font-size: 14px;
 }
-.font-opt .fm { font-family: var(--mono); font-size: 10.5px; color: var(--text-4); font-weight: 400; }
+.font-opt .fm { font-family: var(--mono); font-size: 10.5px; color: var(--text-3); font-weight: 400; }
 .font-opt:hover { background: var(--surface); }
 .font-opt.on { background: var(--surface-2); border-color: var(--border-2); color: var(--text); }
 

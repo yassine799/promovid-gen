@@ -216,7 +216,7 @@ const Form = ({ state, setState }) => {
 
         {/* Headlines */}
         <div style={{ marginBottom: 14 }}>
-          <div style={{ fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Headline</div>
+          <div style={{ fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Headline</div>
           <div className="font-list">
             {fonts.map(f => (
               <div key={f.name} className={`font-opt ${state.fontFamily === f.family ? 'on' : ''}`}
@@ -240,7 +240,7 @@ const Form = ({ state, setState }) => {
 
         {/* Body */}
         <div>
-          <div style={{ fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Body</div>
+          <div style={{ fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Body</div>
           <div className="font-list">
             {fonts.map(f => (
               <div key={f.name} className={`font-opt ${state.bodyFontFamily === f.family ? 'on' : ''}`}
