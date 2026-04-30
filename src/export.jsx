@@ -237,9 +237,12 @@ const ExportModal = ({ state, onClose }) => {
 
       // Hidden video element for frame capture — must be in DOM so
       // requestVideoFrameCallback gets wired into the compositor pipeline.
+      // Muted so autoplay policy never blocks it; audio is captured via
+      // WebAudio (createMediaElementSource) and is unaffected by muting.
       const vid = document.createElement('video');
       vid.src = state.video.url;
       vid.playsInline = true;
+      vid.muted = true;
       Object.assign(vid.style, {
         position: 'fixed', top: '-9999px', left: '-9999px',
         width: '1px', height: '1px', opacity: '0', pointerEvents: 'none',
@@ -330,10 +333,25 @@ const ExportModal = ({ state, onClose }) => {
       setStepIdx(1);
       let frameCount = 0;
       let finished = false;
+      let lastEncodedTime = -1;
+      let rafId = null;
+
+      const encodeFrame = (timestamp) => {
+        ctx.drawImage(vid, 0, 0, W, H);
+        drawOverlay(ctx, W, H, state, logoImg);
+        const vf = new VideoFrame(canvas, { timestamp });
+        videoEncoder.encode(vf, { keyFrame: frameCount === 0 || frameCount % (FPS * 2) === 0 });
+        vf.close();
+        frameCount++;
+        const p = vid.duration ? (vid.currentTime / vid.duration) * 100 : 0;
+        setProg(Math.min(97, p));
+        setStepIdx(p > 85 ? 3 : p > 15 ? 2 : 1);
+      };
 
       const finish = async () => {
         if (finished) return;
         finished = true;
+        if (rafId) cancelAnimationFrame(rafId);
         if (scriptProcessor) { scriptProcessor.disconnect(); scriptProcessor.onaudioprocess = null; }
         if (audioCtx) audioCtx.close();
         if (vid.parentNode) vid.parentNode.removeChild(vid);
@@ -347,29 +365,38 @@ const ExportModal = ({ state, onClose }) => {
         setProg(100);
       };
 
-      // requestVideoFrameCallback fires exactly once per decoded video frame —
-      // avoids the duplicate-timestamp problem that RAF at 60fps causes.
-      const onFrame = (now, metadata) => {
-        ctx.drawImage(vid, 0, 0, W, H);
-        drawOverlay(ctx, W, H, state, logoImg);
+      // Use requestVideoFrameCallback when available (Chrome/Edge) — fires exactly
+      // once per decoded frame with precise mediaTime. Fall back to RAF with
+      // currentTime deduplication for Firefox and other browsers.
+      const supportsRVFC = typeof vid.requestVideoFrameCallback === 'function';
 
-        const timestamp = Math.round(metadata.mediaTime * 1e6);
-        const vf = new VideoFrame(canvas, { timestamp });
-        videoEncoder.encode(vf, { keyFrame: frameCount === 0 || frameCount % (FPS * 2) === 0 });
-        vf.close();
-        frameCount++;
-
-        const p = vid.duration ? (vid.currentTime / vid.duration) * 100 : 0;
-        setProg(Math.min(97, p));
-        setStepIdx(p > 85 ? 3 : p > 15 ? 2 : 1);
-
-        if (!vid.ended) vid.requestVideoFrameCallback(onFrame);
-      };
+      if (supportsRVFC) {
+        const onFrame = (now, metadata) => {
+          if (finished) return;
+          encodeFrame(Math.round(metadata.mediaTime * 1e6));
+          if (!vid.ended) vid.requestVideoFrameCallback(onFrame);
+        };
+        vid.requestVideoFrameCallback(onFrame);
+      } else {
+        const rafLoop = () => {
+          if (finished) return;
+          if (!vid.paused && !vid.ended) {
+            const ct = vid.currentTime;
+            if (ct - lastEncodedTime > 0.001) {
+              encodeFrame(Math.round(ct * 1e6));
+              lastEncodedTime = ct;
+            }
+          }
+          rafId = requestAnimationFrame(rafLoop);
+        };
+        rafId = requestAnimationFrame(rafLoop);
+      }
 
       vid.onended = () => finish();
 
       cleanupRef.current = () => {
         finished = true;
+        if (rafId) cancelAnimationFrame(rafId);
         vid.pause(); vid.src = '';
         if (vid.parentNode) vid.parentNode.removeChild(vid);
         if (scriptProcessor) { scriptProcessor.disconnect(); scriptProcessor.onaudioprocess = null; }
@@ -379,7 +406,6 @@ const ExportModal = ({ state, onClose }) => {
       };
 
       vid.currentTime = 0;
-      vid.requestVideoFrameCallback(onFrame);
       await vid.play();
 
     } catch(e) {
