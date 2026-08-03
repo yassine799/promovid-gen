@@ -174,6 +174,21 @@ function drawOverlay(ctx, W, H, state, logoImg = null) {
     aLines.forEach((l, i) => ctx.fillText(l, x0, aTop + i * aLineH));
     if (cta) fillMeta(cta, x1, bottom - 0.8 * em * 1.2, 0.8, 'right');
   }
+  else if (preset === 'top-strip') {
+    const stripH = H * 0.18;
+    ctx.fillStyle = 'rgba(10,10,16,0.72)';
+    ctx.fillRect(0, 0, W, stripH);
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.fillRect(0, stripH, W, 1);
+    ctx.fillStyle = '#ffffff';
+    const tPad = W * 0.06;
+    const tTop = H * 0.05;
+    const markH = fillArtistMark(tPad, tTop, 1.8, 'left');
+    const metaY = tTop + markH + 0.55 * 1.8 * em;
+    fillMeta(venue, tPad, metaY, 0.8, 'left');
+    fillMeta([dateStr, timeStr].filter(Boolean).join(' · '), W - tPad, metaY, 0.8, 'right');
+    if (cta) fillMeta(cta, W / 2, H * 0.95 - 0.8 * em * 1.2, 0.8, 'center');
+  }
 
   ctx.restore();
 }
