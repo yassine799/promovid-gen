@@ -249,6 +249,41 @@ const Overlay = ({ preset, data, fontFamily, bodyFontFamily, fontScale = 1, anim
     );
   }
 
+  if (preset === 'center-band') {
+    return (
+      <div className={`overlay ${animate ? 'fade-in' : ''}`}>
+        <div style={{
+          position: 'absolute', top: '10%', left: '6%', right: '6%',
+          display: 'flex', justifyContent: 'space-between',
+        }}>
+          {venue && <MetaLine size={0.8} align="left">{venue}</MetaLine>}
+          {dateStr && <MetaLine size={0.8} align="right">{dateStr}</MetaLine>}
+        </div>
+        <div style={{
+          position: 'absolute', left: 0, right: 0, top: '38%',
+          background: 'rgba(10,10,16,0.72)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderTop: '1px solid rgba(255,255,255,0.3)',
+          borderBottom: '1px solid rgba(255,255,255,0.3)',
+          padding: '5% 6%',
+        }}>
+          <ArtistMark size={1.9} textAlign="left" style={{ maxHeight: '4.5em', overflow: 'hidden' }} />
+        </div>
+        {timeStr && (
+          <div style={{ position: 'absolute', bottom: '18%', left: '6%', right: '6%' }}>
+            <MetaLine size={0.8} align="left">{timeStr}</MetaLine>
+          </div>
+        )}
+        {cta && (
+          <div style={{ position: 'absolute', bottom: '5%', left: 0, right: 0 }}>
+            <MetaLine size={0.8} align="center">{cta}</MetaLine>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return null;
 };
 
@@ -340,6 +375,21 @@ const PresetThumb = ({ preset }) => {
           <rect x="20" y="90" width="50" height="2.5" fill={dim}/>
           <rect x="24" y="97" width="42" height="2.5" fill={dim}/>
           <rect x="28" y="104" width="34" height="2.5" fill={dim}/>
+        </svg>
+      );
+    case 'center-band':
+      return (
+        <svg viewBox="0 0 90 160" preserveAspectRatio="none">
+          <rect width="90" height="160" fill="#0f0f10"/>
+          <rect x="8" y="24" width="28" height="2.5" fill={dim}/>
+          <rect x="54" y="24" width="28" height="2.5" fill={dim}/>
+          <rect x="0" y="58" width="90" height="44" fill="rgba(255,255,255,0.08)"/>
+          <rect x="0" y="58" width="90" height="0.8" fill="rgba(255,255,255,0.35)"/>
+          <rect x="0" y="102" width="90" height="0.8" fill="rgba(255,255,255,0.35)"/>
+          <rect x="8" y="65" width="58" height="11" fill={hi}/>
+          <rect x="8" y="79" width="46" height="10" fill={hi}/>
+          <rect x="8" y="112" width="26" height="2.5" fill={dim}/>
+          <rect x="28" y="150" width="34" height="2.5" fill={dim}/>
         </svg>
       );
     default:
