@@ -195,7 +195,7 @@ const Overlay = ({ preset, data, fontFamily, bodyFontFamily, fontScale = 1, anim
           padding: '5% 6% 4%',
           borderBottom: '1px solid rgba(255,255,255,0.25)',
         }}>
-          <ArtistMark size={1.8} textAlign="left" />
+          <ArtistMark size={1.8} textAlign="left" style={{ maxHeight: '4.5em', overflow: 'hidden' }} />
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.55em' }}>
             <MetaLine size={0.8} align="left">{venue}</MetaLine>
             <MetaLine size={0.8} align="right">{[dateStr, timeStr].filter(Boolean).join(' · ')}</MetaLine>
