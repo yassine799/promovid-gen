@@ -184,6 +184,32 @@ const Overlay = ({ preset, data, fontFamily, bodyFontFamily, fontScale = 1, anim
     );
   }
 
+  if (preset === 'top-strip') {
+    return (
+      <div className={`overlay ${animate ? 'fade-in' : ''}`}>
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0,
+          background: 'rgba(10,10,16,0.72)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          padding: '5% 6% 4%',
+          borderBottom: '1px solid rgba(255,255,255,0.25)',
+        }}>
+          <ArtistMark size={1.8} textAlign="left" />
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.55em' }}>
+            <MetaLine size={0.8} align="left">{venue}</MetaLine>
+            <MetaLine size={0.8} align="right">{[dateStr, timeStr].filter(Boolean).join(' · ')}</MetaLine>
+          </div>
+        </div>
+        {cta && (
+          <div style={{ position: 'absolute', bottom: '5%', left: 0, right: 0 }}>
+            <MetaLine size={0.8} align="center">{cta}</MetaLine>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return null;
 };
 
@@ -245,6 +271,19 @@ const PresetThumb = ({ preset }) => {
           <rect x="10" y="120" width="36" height="8" fill={hi}/>
           <rect x="10" y="130" width="28" height="8" fill={hi}/>
           <rect x="68" y="132" width="14" height="2.5" fill={dim}/>
+        </svg>
+      );
+    case 'top-strip':
+      return (
+        <svg viewBox="0 0 90 160" preserveAspectRatio="none">
+          <rect width="90" height="160" fill="#0f0f10"/>
+          <rect x="0" y="0" width="90" height="48" fill="rgba(255,255,255,0.08)"/>
+          <rect x="0" y="48" width="90" height="0.8" fill="rgba(255,255,255,0.35)"/>
+          <rect x="8" y="8" width="52" height="10" fill={hi}/>
+          <rect x="8" y="21" width="40" height="10" fill={hi}/>
+          <rect x="8" y="37" width="24" height="2.5" fill={dim}/>
+          <rect x="58" y="37" width="24" height="2.5" fill={dim}/>
+          <rect x="27" y="150" width="36" height="2.5" fill={dim}/>
         </svg>
       );
     default:
