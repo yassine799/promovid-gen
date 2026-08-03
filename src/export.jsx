@@ -237,6 +237,34 @@ function drawOverlay(ctx, W, H, state, logoImg = null) {
     metas.forEach(line => { fillMeta(line, W / 2, cy, 0.8, 'center'); cy += 0.8 * em * 1.5; });
   }
 
+  else if (preset === 'center-band') {
+    let mH = 0;
+    if (showLogo) mH += safeH * (logoMode === 'logo' ? 28 : 16) * 1.9 / 100;
+    if (showLogo && showText) mH += 0.6 * 1.9 * em;
+    if (showText && artistName) {
+      setDisplay(1.9);
+      mH += wrapWords(ctx, artistName, innerW * 0.97).length * (1.9 * fontScale * em * 0.95);
+    }
+    const bandPadV = H * 0.05;
+    const bandTop = H * 0.38;
+    const bandH = mH + 2 * bandPadV;
+
+    ctx.fillStyle = 'rgba(10,10,16,0.72)';
+    ctx.fillRect(0, bandTop, W, bandH);
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fillRect(0, bandTop, W, 1);
+    ctx.fillRect(0, bandTop + bandH, W, 1);
+
+    ctx.fillStyle = '#ffffff';
+    fillArtistMark(x0, bandTop + bandPadV, 1.9, 'left');
+
+    fillMeta(venue, x0, H * 0.10, 0.8, 'left');
+    fillMeta(dateStr, x1, H * 0.10, 0.8, 'right');
+
+    if (timeStr) fillMeta(timeStr, x0, bandTop + bandH + H * 0.02, 0.8, 'left');
+    if (cta) fillMeta(cta, W / 2, H * 0.95 - 0.8 * em * 1.2, 0.8, 'center');
+  }
+
   ctx.restore();
 }
 
