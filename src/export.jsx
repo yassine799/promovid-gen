@@ -218,7 +218,7 @@ function drawOverlay(ctx, W, H, state, logoImg = null) {
     if (showLogo && showText) mH += 0.6 * 2.0 * em;
     if (showText && artistName) {
       setDisplay(2.0);
-      mH += wrapWords(ctx, artistName, innerW * 0.97).length * (2.0 * fontScale * em * 0.95);
+      mH += wrapWords(ctx, artistName, bW * 0.84).length * (2.0 * fontScale * em * 0.95);
     }
 
     const gapEM = 0.8 * em;
@@ -261,7 +261,7 @@ function drawOverlay(ctx, W, H, state, logoImg = null) {
     fillMeta(venue, x0, H * 0.10, 0.8, 'left');
     fillMeta(dateStr, x1, H * 0.10, 0.8, 'right');
 
-    if (timeStr) fillMeta(timeStr, x0, bandTop + bandH + H * 0.02, 0.8, 'left');
+    if (timeStr) fillMeta(timeStr, x0, H * 0.82, 0.8, 'left');
     if (cta) fillMeta(cta, W / 2, H * 0.95 - 0.8 * em * 1.2, 0.8, 'center');
   }
 
