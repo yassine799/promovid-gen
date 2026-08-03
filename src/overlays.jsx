@@ -210,6 +210,45 @@ const Overlay = ({ preset, data, fontFamily, bodyFontFamily, fontScale = 1, anim
     );
   }
 
+  if (preset === 'poster-stamp') {
+    const tickStyle = (corner) => ({
+      position: 'absolute',
+      width: '14%', height: '6%',
+      ...(corner.includes('top')    ? { top: 0 }    : { bottom: 0 }),
+      ...(corner.includes('left')   ? { left: 0 }   : { right: 0 }),
+      borderTop:    corner.includes('top')    ? '1.5px solid rgba(255,255,255,0.7)' : 'none',
+      borderBottom: corner.includes('bottom') ? '1.5px solid rgba(255,255,255,0.7)' : 'none',
+      borderLeft:   corner.includes('left')   ? '1.5px solid rgba(255,255,255,0.7)' : 'none',
+      borderRight:  corner.includes('right')  ? '1.5px solid rgba(255,255,255,0.7)' : 'none',
+    });
+    return (
+      <div className={`overlay ${animate ? 'fade-in' : ''}`}>
+        <div style={{
+          position: 'absolute', inset: '14% 9%',
+          background: 'rgba(10,10,16,0.68)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          padding: '8%',
+          gap: '0.8em',
+        }}>
+          {['top-left','top-right','bottom-left','bottom-right'].map(c => (
+            <div key={c} style={tickStyle(c)} />
+          ))}
+          <ArtistMark size={2.0} textAlign="center" />
+          <div style={{ height: 1, background: 'rgba(255,255,255,0.35)', width: '80%', flexShrink: 0 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35em', alignItems: 'center' }}>
+            {venue && <MetaLine size={0.8} align="center">{venue}</MetaLine>}
+            {(dateStr || timeStr) && (
+              <MetaLine size={0.8} align="center">{[dateStr, timeStr].filter(Boolean).join(' · ')}</MetaLine>
+            )}
+            {cta && <MetaLine size={0.8} align="center">{cta}</MetaLine>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return null;
 };
 
@@ -284,6 +323,23 @@ const PresetThumb = ({ preset }) => {
           <rect x="8" y="37" width="24" height="2.5" fill={dim}/>
           <rect x="58" y="37" width="24" height="2.5" fill={dim}/>
           <rect x="27" y="150" width="36" height="2.5" fill={dim}/>
+        </svg>
+      );
+    case 'poster-stamp':
+      return (
+        <svg viewBox="0 0 90 160" preserveAspectRatio="none">
+          <rect width="90" height="160" fill="#0f0f10"/>
+          <rect x="8" y="22" width="74" height="116" fill="rgba(255,255,255,0.07)"/>
+          <polyline points="8,38 8,22 24,22" fill="none" stroke={hi} strokeWidth="1.3"/>
+          <polyline points="66,22 82,22 82,38" fill="none" stroke={hi} strokeWidth="1.3"/>
+          <polyline points="8,122 8,138 24,138" fill="none" stroke={hi} strokeWidth="1.3"/>
+          <polyline points="66,138 82,138 82,122" fill="none" stroke={hi} strokeWidth="1.3"/>
+          <rect x="15" y="48" width="60" height="11" fill={hi}/>
+          <rect x="19" y="62" width="52" height="11" fill={hi}/>
+          <rect x="15" y="82" width="60" height="0.8" fill={dim}/>
+          <rect x="20" y="90" width="50" height="2.5" fill={dim}/>
+          <rect x="24" y="97" width="42" height="2.5" fill={dim}/>
+          <rect x="28" y="104" width="34" height="2.5" fill={dim}/>
         </svg>
       );
     default:
