@@ -18,9 +18,6 @@ const PRESETS = [
   { id: 'stacked-bl', label: 'Stack BL' },
   { id: 'side-vert', label: 'Vertical' },
   { id: 'corner-tags', label: 'Corners' },
-  { id: 'top-strip', label: 'Top Strip' },
-  { id: 'poster-stamp', label: 'Stamp' },
-  { id: 'center-band', label: 'Mid Band' },
 ];
 
 const Form = ({ state, setState }) => {
