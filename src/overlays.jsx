@@ -184,6 +184,24 @@ const Overlay = ({ preset, data, fontFamily, bodyFontFamily, fontScale = 1, anim
     );
   }
 
+  if (preset === 'marquee-line') {
+    return (
+      <div className={`overlay ${animate ? 'fade-in' : ''}`}>
+        <div className="safe" style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.7em', alignItems: 'center' }}>
+            <ArtistMark size={2.0} textAlign="center" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <MetaLine size={0.72} align="center">{venue}</MetaLine>
+              {venue && (dateStr || timeStr) && <span style={{ opacity: 0.5, fontSize: '0.72em' }}>—</span>}
+              <MetaLine size={0.72} align="center">{[dateStr, timeStr].filter(Boolean).join(' · ')}</MetaLine>
+            </div>
+            {cta && <MetaLine size={0.62} align="center">{cta}</MetaLine>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return null;
 };
 
@@ -245,6 +263,16 @@ const PresetThumb = ({ preset }) => {
           <rect x="10" y="120" width="36" height="8" fill={hi}/>
           <rect x="10" y="130" width="28" height="8" fill={hi}/>
           <rect x="68" y="132" width="14" height="2.5" fill={dim}/>
+        </svg>
+      );
+    case 'marquee-line':
+      return (
+        <svg viewBox="0 0 90 160" preserveAspectRatio="none">
+          <rect width="90" height="160" fill="#0f0f10"/>
+          <rect x="14" y="68" width="62" height="10" fill={hi}/>
+          <rect x="20" y="84" width="20" height="2.5" fill={dim}/>
+          <rect x="44" y="84" width="6" height="2.5" fill={dim}/>
+          <rect x="54" y="84" width="16" height="2.5" fill={dim}/>
         </svg>
       );
     default:

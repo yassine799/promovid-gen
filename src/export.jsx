@@ -175,6 +175,26 @@ function drawOverlay(ctx, W, H, state, logoImg = null) {
     if (cta) fillMeta(cta, x1, bottom - 0.8 * em * 1.2, 0.8, 'right');
   }
 
+  else if (preset === 'marquee-line') {
+    const midY = safeTop + safeH / 2;
+    const markH = (() => {
+      let h = 0;
+      if (showLogo) h += safeH * (logoMode === 'logo' ? 28 : 16) * 2.0 / 100;
+      if (showLogo && showText) h += 0.6 * 2.0 * em;
+      if (showText && artistName) { setDisplay(2.0); h += wrapWords(ctx, artistName, innerW * 0.97).length * 2.0 * fontScale * em * 0.95; }
+      return h;
+    })();
+    const metaLineH = 0.72 * em * 1.45;
+    const nMeta = [venue, dateStr || timeStr].filter(Boolean).length;
+    const ctaExtra = cta ? 0.62 * em * 1.45 : 0;
+    const totalH = markH + 0.7 * em + nMeta * metaLineH + ctaExtra;
+    let dy = midY - totalH / 2;
+    fillArtistMark(x0, dy, 2.0, 'center'); dy += markH + 0.7 * em;
+    dy += fillMeta(venue, W / 2, dy, 0.72, 'center');
+    dy += fillMeta([dateStr, timeStr].filter(Boolean).join(' · '), W / 2, dy, 0.72, 'center');
+    if (cta) fillMeta(cta, W / 2, dy, 0.62, 'center');
+  }
+
   ctx.restore();
 }
 
