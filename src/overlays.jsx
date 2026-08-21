@@ -184,6 +184,35 @@ const Overlay = ({ preset, data, fontFamily, bodyFontFamily, fontScale = 1, anim
     );
   }
 
+  if (preset === 'ticker-bar') {
+    return (
+      <div className={`overlay ${animate ? 'fade-in' : ''}`}>
+        <div className="safe" style={{ flexDirection: 'column', justifyContent: 'flex-end' }}>
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.55em' }}>
+            {(logoMode === 'text' || logoMode === 'both' || !logoUrl) && artistName && (
+              <div style={{
+                fontFamily, fontWeight: 900, fontSize: `${1.5 * fontScale}em`,
+                lineHeight: 1.02, letterSpacing: '-0.02em', textTransform: 'uppercase', textAlign: 'left',
+                whiteSpace: 'normal', wordBreak: 'normal', overflowWrap: 'break-word', maxWidth: '100%',
+              }}>{artistName}</div>
+            )}
+            {logoUrl && logoMode === 'logo' && (
+              <img className="logo" src={logoUrl} alt="" style={{ height: '2.4em', maxWidth: '60%', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+            )}
+            <div style={{
+              width: '100%', borderTop: '1px solid rgba(255,255,255,0.45)',
+              paddingTop: '0.5em', display: 'flex', flexDirection: 'column', gap: '0.3em',
+            }}>
+              <MetaLine size={0.72} align="left">{venue}</MetaLine>
+              <MetaLine size={0.72} align="left">{[dateStr, timeStr].filter(Boolean).join('  ·  ')}</MetaLine>
+            </div>
+            {cta && <MetaLine size={0.66} align="left">{cta}</MetaLine>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (preset === 'marquee-line') {
     return (
       <div className={`overlay ${animate ? 'fade-in' : ''}`}>
@@ -263,6 +292,17 @@ const PresetThumb = ({ preset }) => {
           <rect x="10" y="120" width="36" height="8" fill={hi}/>
           <rect x="10" y="130" width="28" height="8" fill={hi}/>
           <rect x="68" y="132" width="14" height="2.5" fill={dim}/>
+        </svg>
+      );
+    case 'ticker-bar':
+      return (
+        <svg viewBox="0 0 90 160" preserveAspectRatio="none">
+          <rect width="90" height="160" fill="#0f0f10"/>
+          <rect x="10" y="90" width="60" height="10" fill={hi}/>
+          <rect x="10" y="106" width="70" height="1" fill={dim}/>
+          <rect x="10" y="112" width="24" height="3" fill={dim}/>
+          <rect x="56" y="112" width="24" height="3" fill={dim}/>
+          <rect x="10" y="118" width="70" height="1" fill={dim}/>
         </svg>
       );
     case 'marquee-line':

@@ -18,6 +18,7 @@ const PRESETS = [
   { id: 'stacked-bl', label: 'Stack BL' },
   { id: 'side-vert', label: 'Vertical' },
   { id: 'corner-tags', label: 'Corners' },
+  { id: 'ticker-bar', label: 'Ticker Bar' },
   { id: 'marquee-line', label: 'Marquee' },
 ];
 

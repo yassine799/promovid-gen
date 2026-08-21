@@ -175,6 +175,28 @@ function drawOverlay(ctx, W, H, state, logoImg = null) {
     if (cta) fillMeta(cta, x1, bottom - 0.8 * em * 1.2, 0.8, 'right');
   }
 
+  else if (preset === 'ticker-bar') {
+    const lineH = 0.72 * em * 1.45;
+    const nMeta = [venue, dateStr || timeStr].filter(Boolean).length;
+    const ctaH = cta ? 0.66 * em * 1.45 : 0;
+    const dividerY = bottom - nMeta * lineH - ctaH - 0.5 * em;
+    if (showLogo) {
+      const logoH = safeH * (logoMode === 'logo' ? 28 : 16) * 1.5 / 100;
+      fillLogo(x0, dividerY - logoH - 0.4 * em, logoH, innerW * 0.6, 'left');
+    }
+    if (showText && artistName) {
+      setDisplay(1.5); ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+      const aLines = wrapWords(ctx, artistName, innerW * 0.97);
+      const aLineH = 1.5 * fontScale * em * 0.95;
+      const aTop = dividerY - aLines.length * aLineH - 0.4 * em;
+      aLines.forEach((l, i) => ctx.fillText(l, x0, aTop + (i + 1) * aLineH));
+    }
+    ctx.globalAlpha = 0.45; ctx.fillRect(x0, dividerY, innerW, 1); ctx.globalAlpha = 1;
+    let dy = dividerY + 0.5 * em;
+    dy += fillMeta(venue, x0, dy, 0.72, 'left');
+    dy += fillMeta([dateStr, timeStr].filter(Boolean).join('  ·  '), x0, dy, 0.72, 'left');
+    if (cta) fillMeta(cta, x0, dy, 0.66, 'left');
+  }
   else if (preset === 'marquee-line') {
     const midY = safeTop + safeH / 2;
     const markH = (() => {
