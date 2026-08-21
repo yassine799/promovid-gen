@@ -275,7 +275,9 @@ const ExportModal = ({ state, onClose }) => {
       }
       if (!videoCodec) throw new Error('No supported H.264 encoder found in this browser.');
 
-      // Audio setup — separate video element so WebAudio never touches vid
+      // Audio setup — use an <audio> element (NOT <video>) so Chrome's
+      // createMediaElementSource() never taints the <video> element's
+      // canvas pipeline, which causes drawImage() to return black frames.
       let audVid = null, audioCtx = null, scriptProcessor = null, audioEncoder = null;
       let includeAudio = false;
       let audioTimestamp = 0;
@@ -284,7 +286,15 @@ const ExportModal = ({ state, onClose }) => {
         if (typeof AudioEncoder !== 'undefined') {
           const { supported: audioSupported } = await AudioEncoder.isConfigSupported({ codec: 'mp4a.40.2', sampleRate: 44100, numberOfChannels: 2, bitrate: 128000 });
           if (audioSupported) {
-            audVid = await loadVideo(state.video.url);
+            audVid = document.createElement('audio');
+            audVid.src = state.video.url;
+            offscreen(audVid);
+            document.body.appendChild(audVid);
+            await new Promise((res, rej) => {
+              audVid.onloadedmetadata = res;
+              audVid.onerror = () => rej(new Error('Audio load failed'));
+              setTimeout(() => rej(new Error('Audio load timeout')), 15000);
+            });
             audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 44100 });
             const source = audioCtx.createMediaElementSource(audVid);
             scriptProcessor = audioCtx.createScriptProcessor(4096, 2, 2);
@@ -293,7 +303,7 @@ const ExportModal = ({ state, onClose }) => {
             includeAudio = true;
           }
         }
-      } catch(e) { /* video-only fallback */ }
+      } catch(e) { console.warn('[export] audio setup failed, video-only:', e); }
 
       // Muxer
       const target = new ArrayBufferTarget();
