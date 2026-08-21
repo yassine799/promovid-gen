@@ -359,7 +359,7 @@ const ExportModal = ({ state, onClose }) => {
       // Video encoder
       const videoEncoder = new VideoEncoder({
         output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
-        error: e => { throw e; },
+        error: e => console.error('[export] VideoEncoder error:', e),
       });
       videoEncoder.configure({ codec: videoCodec, width: W, height: H, bitrate: 8_000_000, framerate: FPS });
 
@@ -393,7 +393,12 @@ const ExportModal = ({ state, onClose }) => {
 
       const encodeFrame = (timestamp) => {
         ctx.drawImage(vid, 0, 0, W, H);
-        drawOverlay(ctx, W, H, state, logoImg);
+        try {
+          drawOverlay(ctx, W, H, state, logoImg);
+        } catch (e) {
+          console.error('[export] drawOverlay threw:', e);
+          ctx.globalAlpha = 1;
+        }
         const vf = new VideoFrame(canvas, { timestamp });
         videoEncoder.encode(vf, { keyFrame: frameCount === 0 || frameCount % (FPS * 2) === 0 });
         vf.close();
@@ -430,7 +435,7 @@ const ExportModal = ({ state, onClose }) => {
       if (supportsRVFC) {
         const onFrame = (now, metadata) => {
           if (finished) return;
-          encodeFrame(Math.round(metadata.mediaTime * 1e6));
+          try { encodeFrame(Math.round(metadata.mediaTime * 1e6)); } catch (e) { console.error('[export] encodeFrame threw:', e); }
           if (!vid.ended) vid.requestVideoFrameCallback(onFrame);
         };
         vid.requestVideoFrameCallback(onFrame);
@@ -440,7 +445,7 @@ const ExportModal = ({ state, onClose }) => {
           if (!vid.paused && !vid.ended) {
             const ct = vid.currentTime;
             if (ct - lastEncodedTime > 0.001) {
-              encodeFrame(Math.round(ct * 1e6));
+              try { encodeFrame(Math.round(ct * 1e6)); } catch (e) { console.error('[export] encodeFrame threw:', e); }
               lastEncodedTime = ct;
             }
           }
