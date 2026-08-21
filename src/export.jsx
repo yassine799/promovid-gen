@@ -418,13 +418,22 @@ const ExportModal = ({ state, onClose }) => {
         if (audioCtx) audioCtx.close();
         removeVid(vid); removeVid(audVid);
         setStepIdx(3);
-        await videoEncoder.flush();
-        if (audioEncoder) await audioEncoder.flush();
-        muxer.finalize();
-        const blob = new Blob([target.buffer], { type: 'video/mp4' });
-        setDownloadUrl(URL.createObjectURL(blob));
-        setPhase('done');
-        setProg(100);
+        try {
+          await videoEncoder.flush();
+        } catch(e) { console.warn('[export] videoEncoder.flush failed:', e); }
+        if (audioEncoder) {
+          try { await audioEncoder.flush(); } catch(e) { console.warn('[export] audioEncoder.flush failed:', e); }
+        }
+        try {
+          muxer.finalize();
+          const blob = new Blob([target.buffer], { type: 'video/mp4' });
+          setDownloadUrl(URL.createObjectURL(blob));
+          setPhase('done');
+          setProg(100);
+        } catch(e) {
+          setPhase('error');
+          setErrorMsg('Finalization failed: ' + (e.message || e));
+        }
       };
 
       // Use requestVideoFrameCallback when available (Chrome/Edge) — fires exactly
@@ -454,7 +463,8 @@ const ExportModal = ({ state, onClose }) => {
         rafId = requestAnimationFrame(rafLoop);
       }
 
-      vid.onended = () => finish();
+      vid.onerror = (e) => { setPhase('error'); setErrorMsg('Video playback error: ' + (vid.error?.message || e)); };
+      vid.onended = () => finish().catch(e => { setPhase('error'); setErrorMsg('Export failed: ' + (e.message || e)); });
 
       cleanupRef.current = () => {
         finished = true;
