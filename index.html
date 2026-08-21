@@ -14,7 +14,7 @@
 
   <!-- Load mp4-muxer and expose as global for export -->
   <script type="module">
-    import { Muxer, ArrayBufferTarget } from 'https://esm.sh/mp4-muxer@4.4.7';
+    import { Muxer, ArrayBufferTarget } from 'https://esm.sh/mp4-muxer@4.3.3';
     window.Mp4Muxer = { Muxer, ArrayBufferTarget };
     window.dispatchEvent(new Event('mp4muxer-ready'));
   </script>
