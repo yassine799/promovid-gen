@@ -197,7 +197,7 @@ const Overlay = ({ preset, data, fontFamily, bodyFontFamily, fontScale = 1, anim
               }}>{artistName}</div>
             )}
             {logoUrl && logoMode === 'logo' && (
-              <img className="logo" src={logoUrl} alt="" style={{ height: '2.4em', maxWidth: '60%', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+              <img className="logo" src={logoUrl} alt="" style={{ height: '2.4em', maxWidth: '60%', objectFit: 'contain', objectPosition: 'left', alignSelf: 'flex-start', filter: 'brightness(0) invert(1)' }} />
             )}
             <div style={{
               width: '100%', borderTop: '1px solid rgba(255,255,255,0.45)',
