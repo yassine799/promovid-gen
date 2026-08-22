@@ -351,6 +351,12 @@ textarea.input { height: auto; padding: 7px 10px; resize: vertical; min-height: 
 .canvas-inner {
   position: absolute; inset: 0;
   overflow: hidden;
+  container-type: inline-size;
+}
+
+/* Scale overlay em to match canvas em = W/26 at any preview width */
+.canvas-inner .overlay {
+  font-size: calc(100cqi / 26);
 }
 
 .canvas-inner video,
