@@ -176,15 +176,18 @@ function drawOverlay(ctx, W, H, state, logoImg = null) {
   }
 
   else if (preset === 'ticker-bar') {
+    // Ticker-bar shows logo OR text (not both) — matches DOM overlay behaviour
+    const tbShowLogo = logoImg && logoMode === 'logo';
+    const tbShowText = !logoImg || logoMode === 'text' || logoMode === 'both';
     const lineH = 0.72 * em * 1.45;
     const nMeta = [venue, dateStr || timeStr].filter(Boolean).length;
     const ctaH = cta ? 0.66 * em * 1.45 : 0;
     const dividerY = bottom - nMeta * lineH - ctaH - 0.5 * em;
-    if (showLogo) {
-      const logoH = safeH * (logoMode === 'logo' ? 28 : 16) * 1.5 / 100;
+    if (tbShowLogo) {
+      const logoH = 2.4 * em; // matches DOM: height: '2.4em'
       fillLogo(x0, dividerY - logoH - 0.4 * em, logoH, innerW * 0.6, 'left');
     }
-    if (showText && artistName) {
+    if (tbShowText && artistName) {
       setDisplay(1.5); ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
       const aLines = wrapWords(ctx, artistName, innerW * 0.97);
       const aLineH = 1.5 * fontScale * em * 0.95;
